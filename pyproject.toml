@@ -1,0 +1,13 @@
+[project]
+name = "maibot-token-saver"
+version = "1.0.1"
+description = "MaiBot 上下文瘦身插件（本地开发与测试配置，MaiBot 运行时只读 _manifest.json）"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"

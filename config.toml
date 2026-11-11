@@ -1,0 +1,48 @@
+enabled = true
+dry_run = false
+planner_char_budget = 26000
+replyer_char_budget = 16000
+keep_recent_items = 14
+keep_system_untouched = true
+
+[plugin]
+config_version = "1"
+
+[compression]
+enable_text_compression = true
+collapse_whitespace = true
+dedupe_lines = true
+compact_json = true
+max_tool_output_chars = 1200
+max_reasoning_chars = 700
+max_deferred_tool_desc_chars = 64
+
+[history]
+enable_history_trim = true
+drop_old_reasoning = true
+drop_old_provider_activity = true
+dedupe_consecutive = true
+compact_tool_args = false
+
+[tools]
+enable_tool_slimming = true
+max_tool_description_chars = 360
+aggressive_tool_pruning = false
+max_tool_definitions = 24
+tool_keep_names = "reply,stop,wait,tool_search,query_memory,read_tool_result,send_emoji,view_forward_message"
+
+[output]
+enable_output_condense = true
+enable_extra_prompt_dedupe = true
+simple_reply_model_name = ""
+simple_reply_task_name = "utils"
+simple_reply_max_chars = 40
+
+[auxiliary]
+enable_expression_trim = true
+max_expression_chat_info_chars = 2600
+enable_emoji_trim = true
+max_emoji_context_texts = 8
+max_emoji_sample_size = 12
+enable_stats = true
+verbose_log = false
