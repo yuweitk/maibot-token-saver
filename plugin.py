@@ -9,7 +9,6 @@
     - ``maisaka.replyer.before_model_request``  → 改写 Replyer 的请求 items
     - ``maisaka.replyer.before_request``        → 去重 extra_prompt、可选简单回复模型降级
     - ``expression.select.before_select``       → 裁剪表达方式选择的聊天上下文
-    - ``emoji.maisaka.before_select``           → 裁剪表情选择的上下文与候选数
 
 零侵入：不改 MaiBot 任何源码；停用或删除插件目录即完全回滚。
 """
@@ -431,54 +430,6 @@ class TokenSaverPlugin(MaiBotPlugin):
                 )
         except Exception as exc:  # noqa: BLE001
             self.ctx.logger.warning("Token Saver expression.before_select 失败，已原样放行: %s", exc)
-        return self._continue(kwargs)
-
-    @HookHandler(
-        "emoji.maisaka.before_select",
-        name="emoji_context_saver",
-        description="裁剪表情选择的上下文条数与候选采样数",
-        **_HOOK_KWARGS,
-    )
-    async def emoji_before_select(self, **kwargs: Any) -> Dict[str, Any]:
-        """限制表情选择的上下文条数与候选数量。
-
-        Args:
-            **kwargs: Hook 参数，含 ``context_texts`` / ``sample_size`` / ``reasoning``。
-
-        Returns:
-            Dict[str, Any]: Hook 返回值，异常时原样放行。
-        """
-        policy = self._get_policy()
-        if not policy.enabled or not policy.enable_emoji_trim:
-            return self._continue(kwargs)
-        try:
-            texts = kwargs.get("context_texts")
-            before = sum(len(entry) for entry in texts) if isinstance(texts, list) else 0
-            applied = False
-            if isinstance(texts, list) and len(texts) > policy.max_emoji_context_texts:
-                kwargs["context_texts"] = texts[-policy.max_emoji_context_texts :]
-                applied = True
-            sample_size = kwargs.get("sample_size")
-            if (
-                policy.max_emoji_sample_size > 0
-                and isinstance(sample_size, int)
-                and sample_size > policy.max_emoji_sample_size
-            ):
-                kwargs["sample_size"] = policy.max_emoji_sample_size
-                applied = True
-            reasoning = kwargs.get("reasoning")
-            if isinstance(reasoning, str) and len(reasoning) > 300:
-                kwargs["reasoning"] = truncate_smart(reasoning, 300, head_ratio=0.7)
-                applied = True
-            new_texts = kwargs.get("context_texts")
-            after = sum(len(entry) for entry in new_texts) if isinstance(new_texts, list) else before
-            await self._record(
-                "emoji.maisaka.before_select",
-                before_chars=before, after_chars=after, applied=applied,
-                verbose=self._verbose(policy),
-            )
-        except Exception as exc:  # noqa: BLE001
-            self.ctx.logger.warning("Token Saver emoji.before_select 失败，已原样放行: %s", exc)
         return self._continue(kwargs)
 
     # ------------------------------------------------------------------ 命令
